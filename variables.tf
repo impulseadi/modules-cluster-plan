@@ -37,6 +37,7 @@ variable "private_subnets_cidrs" {
 variable "availability_zones" {
   description = "A list of Availability Zones to use. Leave empty to auto-select."
   type        = list(string)
+  default     = []
 }
 
 variable "enable_dns_hostnames" {
@@ -139,7 +140,7 @@ variable "eks_node_policies" {
 }
 
 #------------------------------------------------------------------------------
-# Worker Node Security Group (sg_*)
+# Worker Node Security Group
 #------------------------------------------------------------------------------
 variable "sg_name" {
   description = "The name for the worker node security group."
@@ -217,7 +218,7 @@ variable "sg_egress_cidr_blocks" {
 }
 
 #------------------------------------------------------------------------------
-# VPC Endpoints Configuration (vpce_*)
+# VPC Endpoints Configuration
 #------------------------------------------------------------------------------
 variable "interface_endpoints" {
   description = "A list of services for which to create VPC interface endpoints (e.g., 'ecr.api')."
@@ -289,6 +290,9 @@ variable "private_dns_enabled" {
   type        = bool
 }
 
+#------------------------------------------------------------------------------
+# Bastion Host Configuration (for bastion module)
+#------------------------------------------------------------------------------
 variable "bastion_ingress_rules" {
   description = "List of ingress rules for bastion security group"
   type = list(object({

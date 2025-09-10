@@ -9,11 +9,6 @@ module "vpc" {
   enable_dns_support    = var.enable_dns_support
   public_route_cidr     = var.public_route_cidr
   private_route_cidr    = var.private_route_cidr
-  bastion_ingress_rules = var.bastion_ingress_rules
-  bastion_egress_rules  = var.bastion_egress_rules
-  bastion_instance_type = var.bastion_instance_type
-  bastion_ami           = var.bastion_ami
-  bastion_key_name      = var.bastion_key_name
   aws_region            = var.aws_region
 }
 
@@ -94,4 +89,17 @@ module "vpc_endpoints" {
   s3_vpc_endpoint_type        = var.s3_vpc_endpoint_type
   interface_vpc_endpoint_type = var.interface_vpc_endpoint_type
   private_dns_enabled         = var.private_dns_enabled
+}
+
+module "bastion" {
+  source = "./modules/bastion"
+
+  cluster_name          = var.cluster_name
+  vpc_id                = module.vpc.vpc_id
+  public_subnet_ids     = module.vpc.public_subnet_ids
+  bastion_ami           = var.bastion_ami
+  bastion_instance_type = var.bastion_instance_type
+  bastion_key_name      = var.bastion_key_name
+  bastion_ingress_rules = var.bastion_ingress_rules
+  bastion_egress_rules  = var.bastion_egress_rules
 }

@@ -95,22 +95,19 @@ interface_vpc_endpoint_type = "Interface"
 private_dns_enabled         = true
 
 
-
+# ----------------------------------------------------------------------------- 
 # Bastion Host Configuration
-
+# -----------------------------------------------------------------------------
 bastion_instance_type = "t2.micro"
 bastion_ami           = "ami-0c55b159cbfafe1f0" # Amazon Linux 2 in eu-west-3
 bastion_key_name      = "my-keypair"            # must exist in AWS
-
-
-# Bastion Host Security Group Rules
 
 bastion_ingress_rules = [
   {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"] # replace with your IP
+    cidr_blocks = ["0.0.0.0/0"] # replace with your own public IP
   }
 ]
 
