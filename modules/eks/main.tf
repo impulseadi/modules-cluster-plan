@@ -6,13 +6,13 @@ resource "aws_eks_cluster" "this" {
 
   vpc_config {
     subnet_ids              = var.private_subnet_ids
-    endpoint_private_access = true
-    endpoint_public_access  = false
-    public_access_cidrs     = []
+    endpoint_private_access = var.endpoint_private_access
+    endpoint_public_access  = var.endpoint_public_access
+    public_access_cidrs     = var.public_access_cidrs
   }
 
-  enabled_cluster_log_types = ["api", "audit", "authenticator"]
-  tags                      = { Name = var.cluster_name }
+  enabled_cluster_log_types = var.enabled_cluster_log_types
+  tags                      = merge({ Name = var.cluster_name }, var.tags)
 
   depends_on = [
     var.cluster_role_policy_attachments
@@ -44,16 +44,14 @@ resource "aws_eks_node_group" "managed_nodes" {
     max_size     = var.node_group_max
   }
 
-  ami_type       = "AL2_x86_64"
+  ami_type       = var.ami_type
   instance_types = var.node_group_instance_types
 
   remote_access {
-    ec2_ssh_key = ""
+    ec2_ssh_key = var.ec2_ssh_key
   }
 
-  tags = {
-    Name = "${var.cluster_name}-managed-node"
-  }
+  tags = merge({ Name = "${var.cluster_name}-managed-node" }, var.tags)
 
   depends_on = [aws_eks_cluster.this]
 }

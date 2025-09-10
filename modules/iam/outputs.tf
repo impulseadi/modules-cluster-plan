@@ -1,12 +1,11 @@
-# Name of the EKS cluster
-variable "cluster_name" {
-  description = "The name of the EKS cluster"
-  type        = string
+# EKS cluster role ARN
+output "eks_cluster_role_arn" {
+  description = "ARN of the EKS cluster IAM role"
+  value       = aws_iam_role.eks_cluster.arn
 }
 
-# Optional: AWS region (if needed in this module, currently not used)
-variable "aws_region" {
-  description = "The AWS region where resources will be created"
-  type        = string
-  default     = "us-east-1"
+# Node group role ARN
+output "node_group_role_arn" {
+  description = "ARN of the EKS node group IAM role"
+  value       = aws_iam_role.node_group.arn
 }

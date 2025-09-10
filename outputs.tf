@@ -17,3 +17,11 @@ output "node_group_arn" {
 output "vpc_id" {
   value = module.vpc.vpc_id
 }
+
+output "my_vpc_id" {
+  value = module.vpc.vpc_id
+}
+
+output "my_public_subnets" {
+  value = module.vpc.public_subnet_ids
+}

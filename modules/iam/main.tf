@@ -5,11 +5,12 @@ data "aws_iam_policy_document" "eks_assume_role" {
   statement {
     actions = ["sts:AssumeRole"]
     principals {
-      type        = "Service"
-      identifiers = ["eks.amazonaws.com"]
+      type        = var.eks_assume_role_principal_type
+      identifiers = var.eks_assume_role_principal_identifiers
     }
   }
 }
+
 
 resource "aws_iam_role" "eks_cluster" {
   name               = "${var.cluster_name}-eks-cluster-role"
@@ -27,18 +28,19 @@ resource "aws_iam_role_policy_attachment" "eks_cluster_AmazonEKSServicePolicy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSServicePolicy"
 }
 
-# -----------------------------
+
 # EKS Node Group IAM Role
-# -----------------------------
+
 data "aws_iam_policy_document" "node_assume_role" {
   statement {
     actions = ["sts:AssumeRole"]
     principals {
-      type        = "Service"
-      identifiers = ["ec2.amazonaws.com"]
+      type        = var.node_assume_role_principal_type
+      identifiers = var.node_assume_role_principal_identifiers
     }
   }
 }
+
 
 resource "aws_iam_role" "node_group" {
   name               = "${var.cluster_name}-node-role"
