@@ -1,55 +1,47 @@
-# ==========================
-# Security Group for Interface Endpoints
-# ==========================
-resource "aws_security_group" "endpoints_sg" {
-  name        = "${var.cluster_name}-endpoints-sg"
-  description = "Security group for interface endpoints"
-  vpc_id      = var.vpc_id
-
-  ingress {
-    from_port   = var.sg_ingress_from_port
-    to_port     = var.sg_ingress_to_port
-    protocol    = var.sg_ingress_protocol
-    cidr_blocks = [var.sg_ingress_cidr]
-  }
-
-  egress {
-    from_port   = var.sg_egress_from_port
-    to_port     = var.sg_egress_to_port
-    protocol    = var.sg_egress_protocol
-    cidr_blocks = var.sg_egress_cidr
-  }
-
-  tags = {
-    Name = "${var.cluster_name}-endpoints-sg"
-  }
-}
-
-# ==========================
-# Gateway Endpoint for S3
-# ==========================
 resource "aws_vpc_endpoint" "s3" {
   vpc_id            = var.vpc_id
   service_name      = "com.amazonaws.${var.aws_region}.${var.s3_service_name}"
-  vpc_endpoint_type = "Gateway"
-  route_table_ids   = var.route_table_ids
+  vpc_endpoint_type = var.s3_vpc_endpoint_type
+  route_table_ids   = [var.route_table_private_id, var.route_table_public_id]
+  tags              = { Name = "${var.cluster_name}-${var.s3_service_name}-endpoint" }
+}
+
+locals {
+  interface_endpoints = var.interface_endpoints
+}
+
+resource "aws_security_group" "endpoints_sg" {
+  name        = var.endpoints_sg_name
+  description = var.endpoints_sg_description
+  vpc_id      = var.vpc_id
+
+  ingress {
+    from_port   = var.ingress_from_port
+    to_port     = var.ingress_to_port
+    protocol    = var.ingress_protocol
+    cidr_blocks = var.ingress_cidr_blocks
+  }
+
+  egress {
+    from_port   = var.egress_from_port
+    to_port     = var.egress_to_port
+    protocol    = var.egress_protocol
+    cidr_blocks = var.egress_cidr_blocks
+  }
+
   tags = {
-    Name = "${var.cluster_name}-s3-endpoint"
+    Name = var.endpoints_sg_name
   }
 }
 
-# ==========================
-# Interface Endpoints
-# ==========================
 resource "aws_vpc_endpoint" "interface_endpoints" {
-  for_each           = toset(var.interface_endpoints)
-  vpc_id             = var.vpc_id
-  service_name       = "com.amazonaws.${var.aws_region}.${each.key}"
-  vpc_endpoint_type  = "Interface"
-  subnet_ids         = var.private_subnet_ids
-  security_group_ids = [aws_security_group.endpoints_sg.id]
-  private_dns_enabled = true
-
+  for_each            = toset(local.interface_endpoints)
+  vpc_id              = var.vpc_id
+  service_name        = "com.amazonaws.${var.aws_region}.${each.key}"
+  vpc_endpoint_type   = var.interface_vpc_endpoint_type
+  subnet_ids          = var.private_subnets_ids
+  security_group_ids  = [aws_security_group.endpoints_sg.id]
+  private_dns_enabled = var.private_dns_enabled
   tags = {
     Name = "${var.cluster_name}-${each.key}-endpoint"
   }

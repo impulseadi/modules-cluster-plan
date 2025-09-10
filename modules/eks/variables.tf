@@ -1,92 +1,91 @@
-variable "cluster_name" {
-  description = "Name of the EKS cluster"
+variable "aws_region" {
   type        = string
+  description = "AWS region"
 }
 
 variable "cluster_version" {
-  description = "Kubernetes version for the EKS cluster"
   type        = string
+  description = "Kubernetes version for the EKS cluster"
 }
 
-variable "aws_region" {
-  description = "AWS region to deploy the cluster"
+variable "cluster_name" {
   type        = string
+  description = "Name of the EKS cluster"
 }
+
 
 variable "cluster_role_arn" {
-  description = "IAM role ARN for EKS cluster"
   type        = string
+  description = "IAM role ARN for the EKS cluster"
 }
 
-variable "cluster_role_policy_attachments" {
-  description = "List of cluster role policy attachments to wait on"
-  type        = list(any)
-}
-
-variable "node_role_arn" {
-  description = "IAM role ARN for EKS node group"
-  type        = string
-}
-
-variable "private_subnet_ids" {
-  description = "List of private subnet IDs for EKS cluster and nodes"
+variable "private_subnets_ids" {
   type        = list(string)
-}
-
-variable "node_group_desired" {
-  description = "Desired size of node group"
-  type        = number
-}
-
-variable "node_group_min" {
-  description = "Minimum size of node group"
-  type        = number
-}
-
-variable "node_group_max" {
-  description = "Maximum size of node group"
-  type        = number
-}
-
-variable "node_group_instance_types" {
-  description = "EC2 instance types for node group"
-  type        = list(string)
-}
-
-# New variables for previously hardcoded values
-variable "enabled_cluster_log_types" {
-  description = "List of EKS control plane log types to enable"
-  type        = list(string)
+  description = "List of private subnet IDs"
 }
 
 variable "endpoint_private_access" {
-  description = "Enable private access to EKS API server"
   type        = bool
+  description = "Enable private endpoint access"
 }
 
 variable "endpoint_public_access" {
-  description = "Enable public access to EKS API server"
   type        = bool
+  description = "Enable public endpoint access"
 }
 
 variable "public_access_cidrs" {
-  description = "List of CIDRs allowed for public access"
   type        = list(string)
+  description = "List of CIDRs allowed for public endpoint access"
 }
 
-variable "ami_type" {
-  description = "AMI type for EKS worker nodes"
-  type        = string
-}
-
-variable "ec2_ssh_key" {
-  description = "SSH key pair name for worker nodes"
-  type        = string
-  default     = ""
+variable "enabled_cluster_log_types" {
+  type        = list(string)
+  description = "Types of logs to enable for EKS cluster"
 }
 
 variable "tags" {
-  description = "Additional tags to apply to resources"
   type        = map(string)
-  default     = {}
+  description = "Tags for the EKS cluster"
+}
+
+
+variable "node_group_role_arn" {
+  type        = string
+  description = "IAM role ARN for the EKS node group"
+}
+
+variable "node_group_desired" {
+  type        = number
+  description = "Desired size of the node group"
+}
+
+variable "node_group_min" {
+  type        = number
+  description = "Minimum size of the node group"
+}
+
+variable "node_group_max" {
+  type        = number
+  description = "Maximum size of the node group"
+}
+
+variable "ami_type" {
+  type        = string
+  description = "AMI type for the node group"
+}
+
+variable "node_group_instance_types" {
+  type        = list(string)
+  description = "List of instance types for the node group"
+}
+
+variable "ec2_ssh_key" {
+  type        = string
+  description = "EC2 SSH key name"
+}
+
+variable "node_group_tags" {
+  type        = map(string)
+  description = "Tags for the node group"
 }

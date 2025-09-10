@@ -1,27 +1,24 @@
 resource "aws_security_group" "workers" {
-  name        = "${var.cluster_name}-workers-sg"
-  description = "Security group for EKS worker nodes"
+  name        = var.sg_name
+  description = var.sg_description
   vpc_id      = var.vpc_id
 
-  # allow nodes to communicate with each other
   ingress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = var.intra_node_protocol
-    self        = true
-    description = "Allow intra-node communication"
+    from_port   = var.ingress_self_from_port
+    to_port     = var.ingress_self_to_port
+    protocol    = var.ingress_self_protocol
+    self        = var.ingress_self_self
+    description = var.ingress_self_description
   }
 
-  # allow nodes to communicate with EKS control plane
   ingress {
-    from_port   = var.control_plane_port
-    to_port     = var.control_plane_port
-    protocol    = var.control_plane_protocol
-    cidr_blocks = [var.vpc_cidr]
-    description = "Allow nodes to reach control plane"
+    from_port   = var.ingress_cp_from_port
+    to_port     = var.ingress_cp_to_port
+    protocol    = var.ingress_cp_protocol
+    cidr_blocks = var.ingress_cp_cidr_blocks
+    description = var.ingress_cp_description
   }
 
-  # allow all outbound traffic
   egress {
     from_port   = var.egress_from_port
     to_port     = var.egress_to_port
@@ -29,9 +26,5 @@ resource "aws_security_group" "workers" {
     cidr_blocks = var.egress_cidr_blocks
   }
 
-  tags = { Name = "${var.cluster_name}-workers-sg" }
-}
-
-output "workers_sg_id" {
-  value = aws_security_group.workers.id
+  tags = var.tags
 }

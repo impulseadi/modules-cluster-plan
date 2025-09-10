@@ -1,21 +1,18 @@
-# -----------------------------
-# EKS Cluster IAM Role
-# -----------------------------
+# EKS cluster IAM role
+resource "aws_iam_role" "eks_cluster" {
+  name               = "${var.cluster_name}-cluster-role"
+  assume_role_policy = data.aws_iam_policy_document.eks_assume_role.json
+  tags               = { Name = "${var.cluster_name}-cluster-role" }
+}
+
 data "aws_iam_policy_document" "eks_assume_role" {
   statement {
     actions = ["sts:AssumeRole"]
     principals {
-      type        = var.eks_assume_role_principal_type
-      identifiers = var.eks_assume_role_principal_identifiers
+      type        = "Service"
+      identifiers = ["eks.amazonaws.com"]
     }
   }
-}
-
-
-resource "aws_iam_role" "eks_cluster" {
-  name               = "${var.cluster_name}-eks-cluster-role"
-  assume_role_policy = data.aws_iam_policy_document.eks_assume_role.json
-  tags               = { Name = "${var.cluster_name}-cluster-role" }
 }
 
 resource "aws_iam_role_policy_attachment" "eks_cluster_AmazonEKSClusterPolicy" {
@@ -28,24 +25,21 @@ resource "aws_iam_role_policy_attachment" "eks_cluster_AmazonEKSServicePolicy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSServicePolicy"
 }
 
-
-# EKS Node Group IAM Role
+# Node group IAM role
+resource "aws_iam_role" "node_group" {
+  name               = "${var.cluster_name}-node-role"
+  assume_role_policy = data.aws_iam_policy_document.node_assume_role.json
+  tags               = { Name = "${var.cluster_name}-node-role" }
+}
 
 data "aws_iam_policy_document" "node_assume_role" {
   statement {
     actions = ["sts:AssumeRole"]
     principals {
-      type        = var.node_assume_role_principal_type
-      identifiers = var.node_assume_role_principal_identifiers
+      type        = "Service"
+      identifiers = ["ec2.amazonaws.com"]
     }
   }
-}
-
-
-resource "aws_iam_role" "node_group" {
-  name               = "${var.cluster_name}-node-role"
-  assume_role_policy = data.aws_iam_policy_document.node_assume_role.json
-  tags               = { Name = "${var.cluster_name}-node-role" }
 }
 
 # Attach managed policies for EKS worker nodes
@@ -64,6 +58,7 @@ resource "aws_iam_role_policy_attachment" "node_AmazonEKS_CNI_Policy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
 }
 
+# Optionally add inline policy for SSM (useful for debugging)
 resource "aws_iam_role_policy_attachment" "node_AmazonSSMManagedInstanceCore" {
   role       = aws_iam_role.node_group.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
